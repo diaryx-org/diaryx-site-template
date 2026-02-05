@@ -8,7 +8,8 @@ import { glob } from "astro/loaders";
 const contentBase = process.env.DIARYX_CONTENT_PATH || "./src/content/diaryx";
 
 const diaryx = defineCollection({
-  loader: glob({ pattern: "**/*.{md,mdx}", base: contentBase }),
+  // Exclude underscore/dot folders (like _template cloned during CI builds)
+  loader: glob({ pattern: ["**/*.{md,mdx}", "!_*/**", "!.*/**"], base: contentBase }),
   schema: z.object({
     // Required properties
     title: z.string(),
