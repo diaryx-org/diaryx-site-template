@@ -5,6 +5,7 @@ audience:
   - public
   - interested in learning more about Diaryx
 date: 10-16-25
+part_of: "[Diaryx](<diaryx.md>)"
 ---
 
 # What is Diaryx?

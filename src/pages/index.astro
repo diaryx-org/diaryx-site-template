@@ -1,14 +1,29 @@
 ---
 import DiaryxLayout from "../layouts/DiaryxLayout.astro";
-import { getEntry } from "astro:content";
+import { getEntry, getCollection, render } from "astro:content";
 
-const index = await getEntry("diaryx", "diaryx-site");
+// Try common index entry names, then fall back to first entry
+const indexSlug = import.meta.env.DIARYX_INDEX_ENTRY || "index";
+let index = await getEntry("diaryx", indexSlug);
 
+// Fallback: try "diaryx" as entry name
 if (!index) {
-  throw new Error("Diaryx specification entry is missing");
+  index = await getEntry("diaryx", "diaryx");
 }
 
-const { Content, headings } = await index.render();
+// Fallback: use the first entry in the collection
+if (!index) {
+  const allEntries = await getCollection("diaryx");
+  if (allEntries.length > 0) {
+    index = allEntries[0];
+  }
+}
+
+if (!index) {
+  throw new Error("No content entries found. Add markdown files to your content folder.");
+}
+
+const { Content, headings } = await render(index);
 const frontmatter = index.data;
 const trimFirstHeading =
   Array.isArray(headings) &&

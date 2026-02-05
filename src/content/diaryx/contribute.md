@@ -8,6 +8,7 @@ audience:
   - relevant technical or other experience
 created: 2025-10-16
 updated: 2025-10-26
+part_of: "[Diaryx](<diaryx.md>)"
 ---
 
 # Contribute to Diaryx

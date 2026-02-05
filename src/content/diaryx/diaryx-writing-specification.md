@@ -12,6 +12,7 @@ format: "[Diaryx v0.8.0](https://spec.diaryx.org)"
 reachable: "[Diaryx Spec Github Repo](https://github.com/adammharris/diaryx-specification)"
 copying: "[Creative Commons Attribution-Sharealike 4.0](https://creativecommons.org/licenses/by-sa/4.0/)"
 version: v0.8.0
+part_of: "[Diaryx](<diaryx.md>)"
 ---
 
 # Diaryx Writing Specification

@@ -1,21 +1,15 @@
 ---
 import DiaryxLayout from "../layouts/DiaryxLayout.astro";
-import { getCollection } from "astro:content";
+import { getCollection, render } from "astro:content";
 
 export async function getStaticPaths() {
   const diaryx = await getCollection("diaryx");
 
-  return diaryx
-    .filter((entry) => entry.id.endsWith(".md"))
-    .map((entry) => {
-      // Remove .md extension from the entry id to create the path
-      const path = entry.id.replace(/\.md$/, "");
-
-      return {
-        params: { path },
-        props: { entry },
-      };
-    });
+  // Content Layer API: entry.id no longer includes file extension
+  return diaryx.map((entry) => ({
+    params: { path: entry.id },
+    props: { entry },
+  }));
 }
 
 const { entry } = Astro.props;
@@ -24,7 +18,7 @@ if (!entry) {
   return Astro.redirect("/404");
 }
 
-const { Content, headings } = await entry.render();
+const { Content, headings } = await render(entry);
 const frontmatter = entry.data;
 
 // Check if first heading matches title (to avoid duplication)

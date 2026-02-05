@@ -4,6 +4,7 @@ author: Adam Harris
 audience:
   - public
   - interested in learning how Diaryx works
+part_of: "[Diaryx](<diaryx.md>)"
 ---
 
 # The History of Diaryx
