@@ -47,7 +47,7 @@ on:
 
 jobs:
   deploy:
-    uses: adammharris/diaryx-site/.github/workflows/build.yml@main
+    uses: diaryx-org/diaryx-site-template/.github/workflows/build.yml@main
     with:
       deploy-target: cloudflare-workers
       cloudflare-project-name: my-diaryx-site
@@ -69,7 +69,7 @@ permissions:
 
 jobs:
   deploy:
-    uses: adammharris/diaryx-site/.github/workflows/build.yml@main
+    uses: diaryx-org/diaryx-site-template/.github/workflows/build.yml@main
     with:
       deploy-target: github-pages
 ```

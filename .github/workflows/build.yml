@@ -1,5 +1,5 @@
 # Reusable workflow for building Diaryx content into a static site
-# Users call this from their content repo with `uses: adammharris/diaryx-site/.github/workflows/build.yml@main`
+# Users call this from their content repo with `uses: diaryx-org/diaryx-site-template/.github/workflows/build.yml@main`
 
 name: Build Diaryx Site
 
@@ -46,7 +46,7 @@ jobs:
       - name: Checkout Diaryx template
         uses: actions/checkout@v4
         with:
-          repository: adammharris/diaryx-site
+          repository: diaryx-org/diaryx-site-template
           ref: ${{ inputs.template-ref }}
           path: site
 
@@ -92,9 +92,7 @@ jobs:
     if: inputs.deploy-target == 'github-pages'
     needs: build
     runs-on: ubuntu-latest
-    permissions:
-      pages: write
-      id-token: write
+    # Note: Caller must grant `pages: write` and `id-token: write` permissions
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
