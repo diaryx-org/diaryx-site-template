@@ -1,0 +1,118 @@
+# Reusable workflow for building Diaryx content into a static site
+# Users call this from their content repo with `uses: adammharris/diaryx-site/.github/workflows/build.yml@main`
+
+name: Build Diaryx Site
+
+on:
+  workflow_call:
+    inputs:
+      template-ref:
+        description: 'Git ref (branch/tag) of the template to use'
+        required: false
+        default: 'main'
+        type: string
+      deploy-target:
+        description: 'Where to deploy: cloudflare-workers, github-pages, or build-only'
+        required: false
+        default: 'build-only'
+        type: string
+      cloudflare-project-name:
+        description: 'Cloudflare Workers project name (required for cloudflare-workers target)'
+        required: false
+        type: string
+    secrets:
+      CF_API_TOKEN:
+        description: 'Cloudflare API token (required for cloudflare-workers target)'
+        required: false
+      CF_ACCOUNT_ID:
+        description: 'Cloudflare Account ID (required for cloudflare-workers target)'
+        required: false
+    outputs:
+      artifact-name:
+        description: 'Name of the uploaded build artifact'
+        value: ${{ jobs.build.outputs.artifact-name }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      artifact-name: diaryx-site-dist
+    steps:
+      - name: Checkout content
+        uses: actions/checkout@v4
+        with:
+          path: content
+
+      - name: Checkout Diaryx template
+        uses: actions/checkout@v4
+        with:
+          repository: adammharris/diaryx-site
+          ref: ${{ inputs.template-ref }}
+          path: site
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+
+      - name: Install dependencies
+        working-directory: site
+        run: bun install
+
+      - name: Build site
+        working-directory: site
+        run: bun run build
+        env:
+          DIARYX_CONTENT_PATH: ../content
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: diaryx-site-dist
+          path: site/dist/
+          retention-days: 1
+
+  deploy-cloudflare:
+    if: inputs.deploy-target == 'cloudflare-workers'
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: diaryx-site-dist
+          path: dist
+
+      - name: Deploy to Cloudflare Workers
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+          accountId: ${{ secrets.CF_ACCOUNT_ID }}
+          command: pages deploy dist --project-name=${{ inputs.cloudflare-project-name }}
+
+  deploy-github-pages:
+    if: inputs.deploy-target == 'github-pages'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: diaryx-site-dist
+          path: dist
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload to GitHub Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
