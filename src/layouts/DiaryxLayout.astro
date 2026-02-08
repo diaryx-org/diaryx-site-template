@@ -28,7 +28,7 @@ const formatEntryValues = (value: unknown): EntryValue[] => {
     return [{ type: "text", text: JSON.stringify(value, null, 2) }];
   }
 
-  return [{ type: "text", text: String(value ?? "") }];
+  return [parseMarkdownLink(String(value ?? ""))];
 };
 
 const formatSummaryValue = (value: unknown) => {
