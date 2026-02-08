@@ -13,8 +13,8 @@ const diaryx = defineCollection({
   schema: z.object({
     // Required properties
     title: z.string(),
-    author: z.string(),
-    audience: z.array(z.string()),
+    author: z.string().optional(),
+    audience: z.array(z.string()).optional(),
 
     // Recommended properties
     created: z.date().optional(),

@@ -2,20 +2,33 @@
 import "./DiaryxLayout.css";
 const { frontmatter, trimFirstHeading = false } = Astro.props;
 
-const formatFrontmatterValue = (value: unknown) => {
+type EntryValue =
+  | { type: "text"; text: string }
+  | { type: "link"; text: string; href: string };
+
+const parseMarkdownLink = (str: string): EntryValue => {
+  const match = String(str).match(/^\[([^\]]+)\]\(([^)]+)\)$/);
+  if (match) {
+    const href = match[2].replace(/\.md$/, "");
+    return { type: "link", text: match[1], href };
+  }
+  return { type: "text", text: String(str) };
+};
+
+const formatEntryValues = (value: unknown): EntryValue[] => {
   if (value instanceof Date) {
-    return value.toISOString().split("T")[0];
+    return [{ type: "text", text: value.toISOString().split("T")[0] }];
   }
 
   if (Array.isArray(value)) {
-    return value.map((item) => String(item)).join("\n");
+    return value.map((item) => parseMarkdownLink(item));
   }
 
   if (typeof value === "object" && value !== null) {
-    return JSON.stringify(value, null, 2);
+    return [{ type: "text", text: JSON.stringify(value, null, 2) }];
   }
 
-  return String(value ?? "");
+  return [{ type: "text", text: String(value ?? "") }];
 };
 
 const formatSummaryValue = (value: unknown) => {
@@ -53,7 +66,7 @@ const pillSummary = pillParts.join(" • ");
 // Get all frontmatter entries for expanded view
 const allEntries = Object.entries(frontmatterRecord).map(([key, value]) => ({
   key,
-  value: formatFrontmatterValue(value),
+  values: formatEntryValues(value),
 }));
 
 const contentClass = `content-body${trimFirstHeading ? " trim-heading" : ""}`;
@@ -94,10 +107,21 @@ const contentClass = `content-body${trimFirstHeading ? " trim-heading" : ""}`;
           <div class="pill-content">
             <dl>
               {
-                allEntries.map(({ key, value }) => (
+                allEntries.map(({ key, values }) => (
                   <div class="pill-row">
                     <dt>{key}</dt>
-                    <dd>{value}</dd>
+                    <dd>
+                      {values.map((v, i) => (
+                        <>
+                          {i > 0 && <br />}
+                          {v.type === "link" ? (
+                            <a href={v.href}>{v.text}</a>
+                          ) : (
+                            v.text
+                          )}
+                        </>
+                      ))}
+                    </dd>
                   </div>
                 ))
               }

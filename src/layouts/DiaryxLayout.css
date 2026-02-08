@@ -397,6 +397,18 @@ main {
   border: 1px solid var(--divider-color);
 }
 
+.pill-content dd a {
+  color: var(--accent-color);
+  text-decoration: none;
+  font-weight: 500;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s ease;
+}
+
+.pill-content dd a:hover {
+  border-bottom-color: var(--accent-color);
+}
+
 @media (prefers-color-scheme: dark) {
   .pill-content dd {
     background: rgba(255, 255, 255, 0.03);
