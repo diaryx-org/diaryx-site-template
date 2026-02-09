@@ -1,21 +1,14 @@
 ---
 import DiaryxLayout from "../layouts/DiaryxLayout.astro";
-import { getEntry, getCollection, render } from "astro:content";
+import { getCollection, render } from "astro:content";
 
-// Try common index entry names, then fall back to first entry
-const indexSlug = import.meta.env.DIARYX_INDEX_ENTRY || "index";
-let index = await getEntry("diaryx", indexSlug);
-
-// Fallback: try "diaryx" as entry name
-if (!index) {
-  index = await getEntry("diaryx", "diaryx");
-}
-
-// Fallback: use the first entry in the collection (skip "404" entry)
-if (!index) {
-  const allEntries = await getCollection("diaryx");
-  index = allEntries.find((e) => e.id !== "404") ?? allEntries[0];
-}
+// Find the workspace root index: the entry with no part_of and non-empty contents.
+// This mirrors diaryx's workspace hierarchy where the root index sits at the top.
+const allEntries = await getCollection("diaryx");
+const index = allEntries.find(
+  (e) => !e.data.part_of && e.data.contents && e.data.contents.length > 0,
+) ?? allEntries.find((e) => !e.data.part_of && e.id !== "404")
+  ?? allEntries[0];
 
 if (!index) {
   throw new Error("No content entries found. Add markdown files to your content folder.");
