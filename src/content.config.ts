@@ -1,15 +1,12 @@
 // src/content.config.ts - Astro 6 Content Layer API
 import { defineCollection } from "astro:content";
 import { z } from "astro/zod";
-import { glob } from "astro/loaders";
-
-// Content path is configurable via env for hot-swappable workspaces
-// Usage: DIARYX_CONTENT_PATH=~/my-workspace bun dev
-const contentBase = process.env.DIARYX_CONTENT_PATH || "./src/content/diaryx";
+import { diaryxLoader } from "./loaders/diaryx";
 
 const diaryx = defineCollection({
-  // Exclude underscore/dot folders (like _template cloned during CI builds)
-  loader: glob({ pattern: ["**/*.{md,mdx}", "!_*/**", "!.*/**"], base: contentBase }),
+  // Uses @diaryx/wasm-node for frontmatter parsing (diaryx_core is the single source of truth).
+  // Content path configurable via DIARYX_CONTENT_PATH env or defaults to ./src/content/diaryx.
+  loader: diaryxLoader(),
   schema: z.object({
     // Required properties
     title: z.string(),

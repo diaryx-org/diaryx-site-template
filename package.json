@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@astrojs/mdx": "5.0.0-beta.4",
+    "@diaryx/wasm-node": "^0.11.0",
+    "@types/node": "^25.2.2",
     "astro": "6.0.0-beta.7",
     "unist-util-visit": "^5.1.0"
   }
