@@ -11,12 +11,10 @@ if (!index) {
   index = await getEntry("diaryx", "diaryx");
 }
 
-// Fallback: use the first entry in the collection
+// Fallback: use the first entry in the collection (skip "404" entry)
 if (!index) {
   const allEntries = await getCollection("diaryx");
-  if (allEntries.length > 0) {
-    index = allEntries[0];
-  }
+  index = allEntries.find((e) => e.id !== "404") ?? allEntries[0];
 }
 
 if (!index) {
